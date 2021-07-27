@@ -1,5 +1,6 @@
 ﻿using System;
 using Terraria.ModLoader;
+using ModLibsCore.Classes.Errors;
 
 
 namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
@@ -7,6 +8,12 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 	/// Provides a mirror of API bindings for ModHelpers mod's Inbox functionality. Respects weak references.
 	/// </summary>
 	public class InboxAPIMirrorsLibraries {
+		private static int InboxCounter = 0;
+
+
+
+		////////////////
+
 		/// <summary>
 		/// Creates an inbox message. New unread messages will be visible by an inventory screen icon until opened.
 		/// Past messages can be viewed.
@@ -17,21 +24,26 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// <param name="onRun">Code to activate when a given message is read. Parameter `true` if message is unread.</param>
 		/// <returns>Note: Returns `true` if call was successful.</returns>
 		public static bool SetMessage( string which, string msg, bool forceUnread, Action<bool> onRun = null ) {
-			var mod = ModLoader.GetMod( "ModHelpers" );
-			if( mod == null ) { return false; }
+			var mod = ModLoader.GetMod( "Messages" );
+			if( mod != null ) {
+				InboxAPIMirrorsLibraries.SetMessage_WeakRef( which, msg, forceUnread, onRun );
+			}
 
-			InboxAPIMirrorsLibraries.SetMessage_WeakRef( which, msg, forceUnread, onRun );
-			return true;
+			return mod != null;
 		}
 
 		/// @private
 		private static void SetMessage_WeakRef( string which, string msg, bool forceUnread, Action<bool> onRun = null ) {
-			var mod = ModLoader.GetMod( "ModHelpers" );
-			if( mod == null ) {
-				return;
-			}
+			Messages.MessagesAPI.AddMessage(
+				title: "Inbox Message"+(InboxAPIMirrorsLibraries.InboxCounter+1),
+				description: msg,
+				modOfOrigin: ModLibsInterModMod.Instance,
+				result: out _,
+				id: which,
+				parent: Messages.MessagesAPI.ModInfoCategoryMsg
+			);
 
-//			ModHelpers.Services.Messages.Inbox.SetMessage( which, msg, forceUnread, onRun );
+			InboxAPIMirrorsLibraries.InboxCounter++;
 		}
 
 
@@ -42,16 +54,17 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// </summary>
 		/// <returns>Note: Returns `null` if call was unsuccessful.</returns>
 		public static int? CountUnreadMessages() {
-			var mod = ModLoader.GetMod( "ModHelpers" );
-			if( mod == null ) { return null; }
+			var mod = ModLoader.GetMod( "Messages" );
+			if( mod != null ) {
+				return InboxAPIMirrorsLibraries.CountUnreadMessages_WeakRef();
+			}
 
-			return InboxAPIMirrorsLibraries.CountUnreadMessages_WeakRef();
+			return null;
 		}
 
 		/// @private
-		private static int? CountUnreadMessages_WeakRef() {
-//			return ModHelpers.Services.Messages.Inbox.CountUnreadMessages();
-return null;
+		private static int CountUnreadMessages_WeakRef() {
+			return Messages.MessagesAPI.GetUnreadMessageIDs().Count;
 		}
 
 
@@ -62,7 +75,7 @@ return null;
 		/// </summary>
 		/// <returns>Note: Returns `null` if call was unsuccessful.</returns>
 		public static string DequeueMessage() {
-			var mod = ModLoader.GetMod( "ModHelpers" );
+			var mod = ModLoader.GetMod( "Messages" );
 			if( mod == null ) { return null; }
 
 			return InboxAPIMirrorsLibraries.DequeueMessage_WeakRef();
@@ -70,8 +83,8 @@ return null;
 
 		/// @private
 		private static string DequeueMessage_WeakRef() {
+			throw new ModLibsException( "DequeueMessage not available yet." );
 //			return ModHelpers.Services.Messages.Inbox.DequeueMessage();
-return null;
 		}
 
 
@@ -84,7 +97,7 @@ return null;
 		/// <param name="msg">The message. Returns `null` if no message found.</param>
 		/// <returns>`true` if unread.</returns>
 		public static bool? GetMessageAt( int pos, out string msg ) {
-			var mod = ModLoader.GetMod( "ModHelpers" );
+			var mod = ModLoader.GetMod( "Messages" );
 			if( mod == null ) {
 				msg = "";
 				return null;
@@ -95,9 +108,8 @@ return null;
 
 		/// @private
 		private static bool? GetMessageAt_WeakRef( int pos, out string msg ) {
+			throw new ModLibsException( "GetMessageAt not available yet." );
 //			return ModHelpers.Services.Messages.Inbox.GetMessageAt( pos, out msg );
-msg = "";
-return null;
 		}
 
 
@@ -110,7 +122,7 @@ return null;
 		/// <param name="msg">The message. Returns `null` if no message found.</param>
 		/// <returns>`true` if unread.</returns>
 		public static bool? ReadMessage( string which, out string msg ) {
-			var mod = ModLoader.GetMod( "ModHelpers" );
+			var mod = ModLoader.GetMod( "Messages" );
 			if( mod == null ) {
 				msg = "";
 				return null;
@@ -121,9 +133,7 @@ return null;
 
 		/// @private
 		private static bool? ReadMessage_WeakRef( string which, out string msg ) {
-//			return ModHelpers.Services.Messages.Inbox.ReadMessage( which, out msg );
-msg = "";
-return null;
+			throw new ModLibsException( "ReadMessage not available yet." );
 		}
 	}
 }
