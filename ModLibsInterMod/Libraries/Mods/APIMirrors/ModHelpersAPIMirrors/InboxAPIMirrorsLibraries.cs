@@ -24,26 +24,30 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// <param name="onRun">Code to activate when a given message is read. Parameter `true` if message is unread.</param>
 		/// <returns>Note: Returns `true` if call was successful.</returns>
 		public static bool SetMessage( string which, string msg, bool forceUnread, Action<bool> onRun = null ) {
-			var mod = ModLoader.GetMod( "Messages" );
-			if( mod != null ) {
-				InboxAPIMirrorsLibraries.SetMessage_WeakRef( which, msg, forceUnread, onRun );
+			Mod mod = ModLoader.GetMod( "Messages" );
+			if( mod == null ) {
+				return false;
 			}
 
-			return mod != null;
-		}
-
-		/// @private
-		private static void SetMessage_WeakRef( string which, string msg, bool forceUnread, Action<bool> onRun = null ) {
-			Messages.MessagesAPI.AddMessage(
-				title: "Inbox Message"+(InboxAPIMirrorsLibraries.InboxCounter+1),
-				description: msg,
-				modOfOrigin: ModLibsInterModMod.Instance,
-				result: out _,
-				id: which,
-				parent: Messages.MessagesAPI.ModInfoCategoryMsg
+			object parentMsg = mod.Call(
+				"GetMessage",
+				"Messages - Mod Info"
+			);
+			
+			mod.Call(
+				"AddMessage",
+				"Inbox Message"+(InboxAPIMirrorsLibraries.InboxCounter+1),  //title
+				msg,							//description
+				ModLibsInterModMod.Instance,	//modOfOrigin
+				which,							//id
+				0,								//weight
+				parentMsg,						//parentMessage
+				true							//alertPlayer
 			);
 
 			InboxAPIMirrorsLibraries.InboxCounter++;
+
+			return true;
 		}
 
 
@@ -54,17 +58,12 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// </summary>
 		/// <returns>Note: Returns `null` if call was unsuccessful.</returns>
 		public static int? CountUnreadMessages() {
-			var mod = ModLoader.GetMod( "Messages" );
+			Mod mod = ModLoader.GetMod( "Messages" );
 			if( mod != null ) {
-				return InboxAPIMirrorsLibraries.CountUnreadMessages_WeakRef();
+				return (int)mod.Call( "GetUnreadMessageCount" );
 			}
 
 			return null;
-		}
-
-		/// @private
-		private static int CountUnreadMessages_WeakRef() {
-			return Messages.MessagesAPI.GetUnreadMessageIDs().Count;
 		}
 
 
@@ -75,16 +74,7 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// </summary>
 		/// <returns>Note: Returns `null` if call was unsuccessful.</returns>
 		public static string DequeueMessage() {
-			var mod = ModLoader.GetMod( "Messages" );
-			if( mod == null ) { return null; }
-
-			return InboxAPIMirrorsLibraries.DequeueMessage_WeakRef();
-		}
-
-		/// @private
-		private static string DequeueMessage_WeakRef() {
 			throw new ModLibsException( "DequeueMessage not available yet." );
-//			return ModHelpers.Services.Messages.Inbox.DequeueMessage();
 		}
 
 
@@ -97,19 +87,7 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// <param name="msg">The message. Returns `null` if no message found.</param>
 		/// <returns>`true` if unread.</returns>
 		public static bool? GetMessageAt( int pos, out string msg ) {
-			var mod = ModLoader.GetMod( "Messages" );
-			if( mod == null ) {
-				msg = "";
-				return null;
-			}
-
-			return InboxAPIMirrorsLibraries.GetMessageAt_WeakRef( pos, out msg );
-		}
-
-		/// @private
-		private static bool? GetMessageAt_WeakRef( int pos, out string msg ) {
 			throw new ModLibsException( "GetMessageAt not available yet." );
-//			return ModHelpers.Services.Messages.Inbox.GetMessageAt( pos, out msg );
 		}
 
 
@@ -122,17 +100,6 @@ namespace ModLibsInterMod.Libraries.Mods.APIMirrors.ModHelpersAPIMirrors {
 		/// <param name="msg">The message. Returns `null` if no message found.</param>
 		/// <returns>`true` if unread.</returns>
 		public static bool? ReadMessage( string which, out string msg ) {
-			var mod = ModLoader.GetMod( "Messages" );
-			if( mod == null ) {
-				msg = "";
-				return null;
-			}
-
-			return InboxAPIMirrorsLibraries.ReadMessage_WeakRef( which, out msg );
-		}
-
-		/// @private
-		private static bool? ReadMessage_WeakRef( string which, out string msg ) {
 			throw new ModLibsException( "ReadMessage not available yet." );
 		}
 	}
