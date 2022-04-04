@@ -1,1 +1,1 @@
-Supplies services for useful interactions with other mods, including added compatibility accommodations.
+Supplies services for useful interactions with other mods, including (limited, WIP) compatibility broker functionality.
